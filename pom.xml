@@ -12,7 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>24</maven.compiler.release>
-        <exec.mainClass>com.mycompany.mp3musicplayer.App</exec.mainClass>
+        <exec.mainClass>mp3musicplayer.App</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -38,7 +38,7 @@
     <build>
         <resources>
             <resource>
-                <directory>resources</directory>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
     </build>

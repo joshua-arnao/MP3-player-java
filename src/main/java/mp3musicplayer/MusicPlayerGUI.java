@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.mp3musicplayer;
+package mp3musicplayer;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -48,7 +48,7 @@ public class MusicPlayerGUI extends JFrame {
         
         // CHANGE FRAME
         getContentPane().setBackground(FRAME_COLOR);
-        ;
+        
         
         addGuiComponents();
     }
