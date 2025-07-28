@@ -30,6 +30,8 @@ public class MusicPlayerGUI extends JFrame {
     public static final Color FRAME_COLOR = Color.BLACK;
     public static final Color TEXT_COLOR = Color.WHITE;
     
+    private MusicPlayer musicPlayer;
+    
     
     public MusicPlayerGUI(){
         // Calls JFrama constructor to configure out GUI and set the titile header to "Music Player"
@@ -89,7 +91,6 @@ public class MusicPlayerGUI extends JFrame {
         JSlider playbackSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         playbackSlider.setBounds(getWidth()/2 - 300/2, 365, 300, 40);
         playbackSlider.setBackground(null);
-        playbackSlider.setBorder(border);
         add(playbackSlider);
         
         //
