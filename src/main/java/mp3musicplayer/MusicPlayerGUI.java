@@ -6,11 +6,15 @@ package mp3musicplayer;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -20,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -31,6 +36,12 @@ public class MusicPlayerGUI extends JFrame {
     public static final Color TEXT_COLOR = Color.WHITE;
     
     private MusicPlayer musicPlayer;
+    
+    // allow us to use file explorer in our app
+    private JFileChooser jFileChooser;
+    
+    private JLabel songTitle, songArtist;
+    private JPanel playbackBtns;
     
     
     public MusicPlayerGUI(){
@@ -56,6 +67,13 @@ public class MusicPlayerGUI extends JFrame {
         // CHANGE FRAME
         getContentPane().setBackground(FRAME_COLOR);
         
+        musicPlayer = new MusicPlayer();
+        jFileChooser = new JFileChooser();
+        
+        // Set a default path for file explorer
+        jFileChooser.setCurrentDirectory(new File("src/resources"));
+        
+        jFileChooser.setFileFilter(new FileNameExtensionFilter("MP3", "mp3"));
         
         addGuiComponents();
         
@@ -72,7 +90,7 @@ public class MusicPlayerGUI extends JFrame {
         add(songImage);
         
         // song titlte
-        JLabel songTitle = new JLabel("Song Title");
+        songTitle = new JLabel("Song Title");
         songTitle.setBounds(0, 285, getWidth() - 20, 30);
         songTitle.setFont(new Font("SF Pro", Font.BOLD, 24));
         songTitle.setForeground(TEXT_COLOR);
@@ -80,7 +98,7 @@ public class MusicPlayerGUI extends JFrame {
         add(songTitle);
         
         // Song Arrtist
-        JLabel songArtist = new JLabel("Song Artist");
+        songArtist = new JLabel("Song Artist");
         songArtist.setBounds(0, 320, getWidth() - 20, 30);
         songArtist.setFont(new Font("SF Pro", Font.PLAIN , 20));
         songArtist.setForeground(TEXT_COLOR);
@@ -117,6 +135,27 @@ public class MusicPlayerGUI extends JFrame {
         
         // create a option 1 to Item of menu
         JMenuItem loadSong = new JMenuItem("Load Song");
+        loadSong.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                int result = jFileChooser.showOpenDialog(MusicPlayerGUI.this);
+                File seletedFile = jFileChooser.getSelectedFile();
+                
+                if(result == JFileChooser.APPROVE_OPTION && seletedFile != null){
+                    // Create a song obj based on selected file
+                    Song song = new Song(seletedFile.getPath());
+                    
+                    // load song in music player
+                    musicPlayer.loadSong(song);
+                    
+                    // update song title and artist
+                    updateSongTitleAndArtist(song);
+                    
+                    // Toggle on pause button and toggle off play button
+                    enablePauseButtonDisablePlayButton();
+                }
+            }
+        });
         songMenu.add(loadSong);
         
         // Create a Item 2 to menu
@@ -136,7 +175,7 @@ public class MusicPlayerGUI extends JFrame {
     }
     
     private void addPlaybackBtns(){
-        JPanel playbackBtns = new JPanel();
+        playbackBtns = new JPanel();
         playbackBtns.setBounds(0, 435, getWidth() - 10, 80);
         playbackBtns.setBackground(null);
         
@@ -150,6 +189,16 @@ public class MusicPlayerGUI extends JFrame {
         JButton playButton = new JButton(loadImage("play.png"));
         playButton.setBorderPainted(false);
         playButton.setBackground(null);
+        playButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                // toggle off play button and toggle on pause button
+                enablePauseButtonDisablePlayButton();
+                
+                // Play or resume song
+                musicPlayer.playCurrentSong();
+            }
+        });
         playbackBtns.add(playButton);
         
         // PauseButton
@@ -157,6 +206,16 @@ public class MusicPlayerGUI extends JFrame {
         pauseButton.setBorderPainted(false);
         pauseButton.setBackground(null);
         pauseButton.setVisible(false);
+        pauseButton.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               // Toggle off
+               enablePauseButtonDisablePauseButton();
+               
+               // Pause the song
+               musicPlayer.pauseSong();
+           }
+        });
         playbackBtns.add(pauseButton);
         
         // NextButton
@@ -167,6 +226,39 @@ public class MusicPlayerGUI extends JFrame {
         
         add(playbackBtns);
        
+    }
+    
+    private void updateSongTitleAndArtist(Song song){
+        songTitle.setText(song.getSongTitle());
+        songArtist.setText(song.getSongArtist());
+    }
+    
+    private void enablePauseButtonDisablePlayButton(){
+        // retrieve reference to play button from playbackBtns panel
+        JButton playButton = (JButton) playbackBtns.getComponent(1);
+        JButton pauseButton = (JButton) playbackBtns.getComponent(2);
+        
+        // turn off play button
+        playButton.setVisible(false);
+        playButton.setEnabled(false);
+        
+        // turn on pause button
+        pauseButton.setVisible(true);
+        pauseButton.setEnabled(true);   
+    }
+    
+    private void enablePauseButtonDisablePauseButton(){
+        // retrieve reference to play button from playbackBtns panel
+        JButton playButton = (JButton) playbackBtns.getComponent(1);
+        JButton pauseButton = (JButton) playbackBtns.getComponent(2);
+        
+        // turn off play button
+        playButton.setVisible(true);
+        playButton.setEnabled(true);
+        
+        // turn on pause button
+        pauseButton.setVisible(false);
+        pauseButton.setEnabled(false);   
     }
     
     private ImageIcon loadImage(String imagePath){

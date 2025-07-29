@@ -24,45 +24,25 @@ public class Song {
     private String songLength;
     private String filePath;
     
-    public Song(String resourceName){
-        // this.filePath = filePath;
-        try{
-            // use the jaudiotagger library to create an audiofile object to read mp3 file's information
-            InputStream input = getClass().getClassLoader().getResourceAsStream(resourceName);
-            if(input == null ||  input.equals("")){
-                System.out.println("Archivo no encontrado en recursos: " + resourceName);
-                songTitle = "N/A";
-                songArtist = "N/A";
-            }
-            
-            File tempFile = File.createTempFile("Song-", ".mp3");
-            tempFile.deleteOnExit();
-            try(FileOutputStream out = new FileOutputStream(tempFile)){
-                byte[] buffer = new byte[1024];
-                int length;
-                
-                while((length = input.read(buffer))>0){
-                    out.write(buffer, 0, length);
-                }
-            }
-            
-            AudioFile audioFile = AudioFileIO.read(tempFile);
-            
-            // read through the meta data of the audio file
-            Tag tag = audioFile.getTag();
+    public Song(String filePath){
+        this.filePath = filePath;
+        try {
+            File audioFile = new File(filePath);
+            AudioFile audio = AudioFileIO.read(audioFile);
+            Tag tag = audio.getTag();
+
             if(tag != null){
                 songTitle = tag.getFirst(FieldKey.TITLE);
                 songArtist = tag.getFirst(FieldKey.ARTIST);
             } else {
-                // could not read through mp3 files's
                 songTitle = "N/A";
                 songArtist = "N/A";
             }
         } catch(Exception e) {
             e.printStackTrace();
+            songTitle = "N/A";
+            songArtist = "N/A";
         }
-        
-        
     }
 
     public String getSongTitle() {

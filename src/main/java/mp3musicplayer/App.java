@@ -15,11 +15,11 @@ public class App {
         SwingUtilities.invokeLater(new Runnable(){
             @Override
             public void run(){
-                //new MusicPlayerGUI().setVisible(true);
+                new MusicPlayerGUI().setVisible(true);
                 
-                Song song = new Song("Locked Out Of Heaven.mp3");
-                System.out.println(song.getSongTitle());
-                System.out.println(song.getSongArtist());
+                //Song song = new Song("Locked Out Of Heaven.mp3");
+                //System.out.println(song.getSongTitle());
+                //System.out.println(song.getSongArtist());
                 
             }
         
