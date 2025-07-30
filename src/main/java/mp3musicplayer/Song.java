@@ -4,9 +4,8 @@
  */
 package mp3musicplayer;
 
+import com.mpatric.mp3agic.Mp3File;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
@@ -23,10 +22,16 @@ public class Song {
     private String songArtist;
     private String songLength;
     private String filePath;
+    private Mp3File mp3File;
+    private double frameRatePerMilliseconds;
     
     public Song(String filePath){
         this.filePath = filePath;
         try {
+            mp3File = new Mp3File(filePath);
+            frameRatePerMilliseconds = (double) mp3File.getFrameCount() / mp3File.getLengthInMilliseconds();
+            songLength = convertToSongLengthFormat();
+            
             File audioFile = new File(filePath);
             AudioFile audio = AudioFileIO.read(audioFile);
             Tag tag = audio.getTag();
@@ -44,36 +49,32 @@ public class Song {
             songArtist = "N/A";
         }
     }
+    
+    private String convertToSongLengthFormat(){
+        long minutes = mp3File.getLengthInSeconds() / 60;
+        long seconds = mp3File.getLengthInSeconds() % 60;
+        String formattedTime = String.format("%02d:%02d", minutes, seconds);
+        
+        return formattedTime;
+    }
 
     public String getSongTitle() {
         return songTitle;
     }
-
-    public void setSongTitle(String songTitle) {
-        this.songTitle = songTitle;
-    }
-
+    
     public String getSongArtist() {
         return songArtist;
-    }
-
-    public void setSongArtist(String songArtist) {
-        this.songArtist = songArtist;
     }
 
     public String getSongLength() {
         return songLength;
     }
 
-    public void setSongLength(String songLength) {
-        this.songLength = songLength;
-    }
-
     public String getFilePath() {
         return filePath;
     }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
+    
+    public Mp3File getMp3File(){return mp3File;}
+    
+    public double getFrameRatePerMilliseconds(){return frameRatePerMilliseconds;}
 }

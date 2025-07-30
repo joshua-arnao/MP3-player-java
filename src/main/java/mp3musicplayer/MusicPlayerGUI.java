@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Hashtable;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,6 +43,7 @@ public class MusicPlayerGUI extends JFrame {
     
     private JLabel songTitle, songArtist;
     private JPanel playbackBtns;
+    private JSlider playbackSlider;
     
     
     public MusicPlayerGUI(){
@@ -67,7 +69,7 @@ public class MusicPlayerGUI extends JFrame {
         // CHANGE FRAME
         getContentPane().setBackground(FRAME_COLOR);
         
-        musicPlayer = new MusicPlayer();
+        musicPlayer = new MusicPlayer(this);
         jFileChooser = new JFileChooser();
         
         // Set a default path for file explorer
@@ -82,7 +84,6 @@ public class MusicPlayerGUI extends JFrame {
     
     private void addGuiComponents(){
         addToolbar();
-        
         
         // Load record imag
         JLabel songImage = new JLabel(loadImage("record.png"));
@@ -106,16 +107,13 @@ public class MusicPlayerGUI extends JFrame {
         add(songArtist);
         
         // Playback slider
-        JSlider playbackSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
+        playbackSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
         playbackSlider.setBounds(getWidth()/2 - 300/2, 365, 300, 40);
         playbackSlider.setBackground(null);
         add(playbackSlider);
         
         //
         addPlaybackBtns();
-        
-      
-        
     }
     
     private void addToolbar(){
@@ -150,6 +148,9 @@ public class MusicPlayerGUI extends JFrame {
                     
                     // update song title and artist
                     updateSongTitleAndArtist(song);
+                    
+                    // update playback slider
+                    updatePlaybackSlider(song);
                     
                     // Toggle on pause button and toggle off play button
                     enablePauseButtonDisablePlayButton();
@@ -228,9 +229,39 @@ public class MusicPlayerGUI extends JFrame {
        
     }
     
+    // This will be used to update our slider from the music player class
+    public void setPlaybackSliderValue(int frame){
+        playbackSlider.setValue(frame);
+    }
+    
     private void updateSongTitleAndArtist(Song song){
         songTitle.setText(song.getSongTitle());
         songArtist.setText(song.getSongArtist());
+    }
+    
+    private void updatePlaybackSlider(Song song){
+        // update max count for slider
+        playbackSlider.setMaximum(song.getMp3File().getFrameCount());
+        
+        // Create the song length label
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
+        
+        // beginning will be 00:00
+        JLabel labelBeginnig = new JLabel("00:00");
+        labelBeginnig.setFont(new Font("SF Pro", Font.BOLD, 18));
+        labelBeginnig.setForeground(TEXT_COLOR);
+        
+        // end will vary depending on the song
+        JLabel labelEnd = new JLabel(song.getSongLength());
+        labelEnd.setFont(new Font("SF Pro", Font.BOLD, 18));
+        labelEnd.setForeground(TEXT_COLOR);
+        
+        labelTable.put(0, labelBeginnig);
+        labelTable.put(song.getMp3File().getFrameCount(), labelEnd);
+        
+        playbackSlider.setLabelTable(labelTable);
+        playbackSlider.setPaintLabels(true);
+        
     }
     
     private void enablePauseButtonDisablePlayButton(){
